@@ -2,5 +2,12 @@
 name = "waifai"
 version = "0.0.0"
 edition = "2021"
+authors = ["CosminPerRam [https://github.com/CosminPerRam]"]
+license = "MIT"
+description = "Interface with WiFi networks."
+readme = "README.md"
+categories = ["network-programming"]
+
+[features]
 
 [dependencies]
