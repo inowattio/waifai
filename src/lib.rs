@@ -1,14 +1,37 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+
+pub trait Client {
+    fn connect(&self);
+    fn disconnect(&self);
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub trait Hotspot {
+    fn create(&self);
+    fn start(&self);
+    fn stop(&self);
+}
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+pub struct WiFi;
+
+impl Client for WiFi {
+    fn connect(&self) {
+        todo!()
+    }
+
+    fn disconnect(&self) {
+        todo!()
+    }
+}
+
+impl Hotspot for WiFi {
+    fn create(&self) {
+        todo!()
+    }
+
+    fn start(&self) {
+        todo!()
+    }
+
+    fn stop(&self) {
+        todo!()
     }
 }
