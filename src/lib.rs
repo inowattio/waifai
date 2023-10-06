@@ -1,16 +1,26 @@
+use crate::error::WFResult;
+
+mod error;
+
+struct Network {
+    ssid: String,
+}
 
 pub trait Client {
-    fn connect(&self);
-    fn disconnect(&self);
-    fn turn_off(&self);
-    fn turn_on(&self);
-    fn is_on(&self);
+    fn connect(&self, network: &Network) -> WFResult<()>;
+    fn disconnect(&self) -> WFResult<()>;
+    fn turn_off(&self) -> WFResult<()>;
+    fn turn_on(&self) -> WFResult<()>;
+    fn scan(&self) -> WFResult<Vec<Network>>;
+    fn is_on(&self) -> WFResult<bool>;
 }
 
 pub trait Hotspot {
-    fn create(&self);
-    fn start(&self);
-    fn stop(&self);
+    fn create(&self, network: Network) -> WFResult<()>;
+    fn start(&self) -> WFResult<()>;
+    fn stop(&self) -> WFResult<()>;
+    fn clients(&self) -> WFResult<Vec<String>>;
+    fn is_active(&self) -> WFResult<bool>;
 }
 
 pub struct WiFi {
@@ -30,37 +40,49 @@ impl WiFi {
 }
 
 impl Client for WiFi {
-    fn connect(&self) {
+    fn connect(&self, network: &Network) -> WFResult<()> {
         todo!()
     }
 
-    fn disconnect(&self) {
+    fn disconnect(&self) -> WFResult<()> {
         todo!()
     }
 
-    fn turn_off(&self) {
+    fn turn_off(&self) -> WFResult<()> {
         todo!()
     }
 
-    fn turn_on(&self) {
+    fn turn_on(&self) -> WFResult<()> {
         todo!()
     }
 
-    fn is_on(&self) {
+    fn scan(&self) -> WFResult<Vec<Network>> {
+        todo!()
+    }
+
+    fn is_on(&self) -> WFResult<bool> {
         todo!()
     }
 }
 
 impl Hotspot for WiFi {
-    fn create(&self) {
+    fn create(&self, network: Network) -> WFResult<()> {
         todo!()
     }
 
-    fn start(&self) {
+    fn start(&self) -> WFResult<()> {
         todo!()
     }
 
-    fn stop(&self) {
+    fn stop(&self) -> WFResult<()> {
+        todo!()
+    }
+
+    fn clients(&self) -> WFResult<Vec<String>> {
+        todo!()
+    }
+
+    fn is_active(&self) -> WFResult<bool> {
         todo!()
     }
 }
