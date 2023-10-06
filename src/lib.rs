@@ -2,6 +2,9 @@
 pub trait Client {
     fn connect(&self);
     fn disconnect(&self);
+    fn turn_off(&self);
+    fn turn_on(&self);
+    fn is_on(&self);
 }
 
 pub trait Hotspot {
@@ -10,7 +13,21 @@ pub trait Hotspot {
     fn stop(&self);
 }
 
-pub struct WiFi;
+pub struct WiFi {
+    interface: String,
+}
+
+impl WiFi {
+    fn new(interface: String) -> Self {
+        Self {
+            interface
+        }
+    }
+
+    fn interfaces() -> Vec<String> {
+        vec!["lol".to_string()]
+    }
+}
 
 impl Client for WiFi {
     fn connect(&self) {
@@ -18,6 +35,18 @@ impl Client for WiFi {
     }
 
     fn disconnect(&self) {
+        todo!()
+    }
+
+    fn turn_off(&self) {
+        todo!()
+    }
+
+    fn turn_on(&self) {
+        todo!()
+    }
+
+    fn is_on(&self) {
         todo!()
     }
 }
