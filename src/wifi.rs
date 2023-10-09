@@ -6,6 +6,7 @@ use crate::error::{WFError, WFResult};
 use crate::hotspot::Hotspot;
 use crate::network::Network;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct WiFi {
     interface: String,
 }

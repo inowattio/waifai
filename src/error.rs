@@ -1,7 +1,7 @@
 
 pub type WFResult<T> = Result<T, WFError>;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum WFError {
     CommandIO,
     CommandParse,
