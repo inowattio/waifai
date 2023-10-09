@@ -5,7 +5,8 @@ pub trait Hotspot {
     /// this method doesnt start the hotspot, that's handled by [crate](Hotspot::create).
     fn create(&self, ssid: String, password: Option<String>) -> WFResult<()>; // TODO: what happens if it creates over an already created one?
     /// Starts the previously created hotspot, this is not blocking.
-    fn start(&self) -> WFResult<()>; // TODO: what happens if it starts 2 times?
+    /// Doesn't fail if the hotspot is already created.
+    fn start(&self) -> WFResult<()>;
     /// Stops created hotspot.
     fn stop(&self) -> WFResult<()>;
     // fn clients(&self) -> WFResult<Vec<String>>;
