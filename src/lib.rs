@@ -103,7 +103,7 @@ impl Hotspot for WiFi {
             "ssid", network.ssid.as_str()])?;
 
         if !output.contains("successfully added") {
-            Err(HotspotCreate)?
+            Err(HotspotCreate(output))?
         }
 
         let output = self.command("nmcli", ["con", "modify",
@@ -111,21 +111,21 @@ impl Hotspot for WiFi {
             "ipv4.method shared"])?;
 
         if !output.is_empty() {
-            Err(HotspotCreate)?
+            Err(HotspotCreate(output))?
         }
 
         let output = self.command("nmcli", ["con", "modify",
             "Hotspot", "wifi-sec.key-mgmt", "wpa-psk"])?;
 
         if !output.is_empty() {
-            Err(HotspotCreate)?
+            Err(HotspotCreate(output))?
         }
 
         let output = self.command("nmcli", ["con", "modify",
             "Hotspot", "wifi-sec.psk", network.password.as_str()])?;
 
         if !output.is_empty() {
-            Err(HotspotCreate)?
+            Err(HotspotCreate(output))?
         }
 
         Ok(())
@@ -135,7 +135,7 @@ impl Hotspot for WiFi {
         let output = self.command("nmcli", ["con", "up", "Hotspot"])?;
 
         if !output.contains("Connection successfully activated") {
-            Err(HotspotCreate)?
+            Err(HotspotCreate(output))?
         }
 
         Ok(())
@@ -145,7 +145,7 @@ impl Hotspot for WiFi {
         let output = self.command("nmcli", ["con", "down", "Hotspot"])?;
 
         if !output.contains("Connection successfully activated") {
-            Err(HotspotCreate)?
+            Err(HotspotCreate(output))?
         }
 
         Ok(())
