@@ -7,6 +7,7 @@ pub mod error;
 
 #[derive(Debug)]
 pub struct Network {
+    connected: bool,
     bssid: String,
     ssid: String,
     mode: String,
@@ -18,12 +19,13 @@ pub struct Network {
 
 
 pub trait Client {
-    fn connect(&self, ssid: String, password: String) -> WFResult<()>;
+    fn connect(&self, ssid: String, password: Option<String>) -> WFResult<bool>;
     fn disconnect(&self) -> WFResult<()>;
     fn turn_off(&self) -> WFResult<()>;
     fn turn_on(&self) -> WFResult<()>;
-    fn scan(&self) -> WFResult<Vec<Network>>;
     fn is_on(&self) -> WFResult<bool>;
+    fn scan(&self, forceRescan: bool) -> WFResult<Vec<Network>>;
+    fn connected(&self) -> WFResult<Option<Network>>;
 }
 
 pub trait Hotspot {
@@ -75,15 +77,24 @@ impl WiFi {
 }
 
 impl Client for WiFi {
-    fn connect(&self, ssid: String, password: String) -> WFResult<()> {
-        let output = self.command("nmcli", ["device", "wifi", "connect",
-            &ssid, "password", &password, "ifname", &self.interface])?;
+    fn connect(&self, ssid: String, password: Option<String>) -> WFResult<bool> {
+        let password_arg: &str = match password.as_ref() {
+            None => "nopassword",
+            Some(password) => password
+        };
+
+        let output = self.command("nmcli", &["device", "wifi", "connect",
+            &ssid, "password", password_arg, "ifname", &self.interface])?;
+
+        if output.contains("Secrets were required") {
+            return Ok(false);
+        }
 
         if !output.contains("successfully activated") {
             Err(WifiAction(output))?
         }
 
-        Ok(())
+        Ok(true)
     }
 
     fn disconnect(&self) -> WFResult<()> {
@@ -104,16 +115,18 @@ impl Client for WiFi {
         todo!()
     }
 
-    fn scan(&self) -> WFResult<Vec<Network>> {
-        let output = self.command("nmcli", ["device", "wifi", "rescan",
-            "ifname", &self.interface])?;
+    fn is_on(&self) -> WFResult<bool> {
+        todo!()
+    }
 
-        if !output.is_empty() {
-            Err(WifiAction(output))?
-        }
+    fn scan(&self, force_rescan: bool) -> WFResult<Vec<Network>> {
+        let force_rescan = match force_rescan {
+            true => "yes",
+            false => "no"
+        };
 
         let output = self.command("nmcli", ["device", "wifi", "list",
-            "ifname", &self.interface])?;
+            "ifname", &self.interface, "--rescan", force_rescan])?;
 
         let output = output.lines().collect::<Vec<&str>>();
         let mut output = output.iter();
@@ -145,7 +158,9 @@ impl Client for WiFi {
 
         let mut networks = Vec::new();
         for line in output.by_ref() {
-            let mut index = words[0].len();
+            let mut index = 0;
+            let connected = line[index..index + words[0].len()].trim().to_string().contains('*');
+            index += words[0].len();
             let bssid = line[index..index + words[1].len()].trim().to_string();
             index += words[1].len();
             let ssid = line[index..index + words[2].len()].trim().to_string();
@@ -161,6 +176,7 @@ impl Client for WiFi {
             let security = line[index..].trim().to_string();
 
             networks.push(Network {
+                connected,
                 bssid,
                 ssid,
                 mode,
@@ -174,8 +190,16 @@ impl Client for WiFi {
         Ok(networks)
     }
 
-    fn is_on(&self) -> WFResult<bool> {
-        todo!()
+    fn connected(&self) -> WFResult<Option<Network>> {
+        let networks = self.scan(false)?;
+
+        for network in networks {
+            if network.connected {
+                return Ok(Some(network))
+            }
+        }
+
+        Ok(None)
     }
 }
 
