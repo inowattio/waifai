@@ -186,9 +186,11 @@ impl Client for WiFi {
 
 impl Hotspot for WiFi {
     fn create(&self, ssid: String, password: Option<String>) -> WFResult<()> {
+        let id = "Hotspot"; // TODO: dynamic ids/use uuid
+        let _ = self.command("nmcli", ["con", "delete", id]);
+
         let output = self.command("nmcli", ["con", "add", "type", "wifi",
-            "ifname", &self.interface, "con-name", "Hotspot", "autoconnect", "yes",
-            "ssid", &ssid])?;
+            "ifname", &self.interface, "con-name", id, "autoconnect", "yes", "ssid", &ssid])?;
 
         if !output.contains("successfully added") {
             Err(HotspotCreate(output))?
