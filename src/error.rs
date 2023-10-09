@@ -6,5 +6,6 @@ pub enum WFError {
     CommandIO,
     CommandParse,
     CommandErr(String),
+    WifiAction(String),
     HotspotCreate(String),
 }
