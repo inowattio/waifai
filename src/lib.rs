@@ -68,7 +68,7 @@ impl WiFi {
             .parse()
             .map_err(|err| WFError::CommandParse)?;
 
-        Ok(string.replace("\n", ""))
+        Ok(string.trim().to_string())
     }
 }
 
@@ -101,8 +101,8 @@ impl Client for WiFi {
 impl Hotspot for WiFi {
     fn create(&self, network: Network) -> WFResult<()> {
         let output = self.command("nmcli", ["con", "add", "type", "wifi",
-            "ifname", self.interface.as_str(), "con-name", "Hotspot", "autoconnect", "yes",
-            "ssid", network.ssid.as_str()])?;
+            "ifname", &self.interface, "con-name", "Hotspot", "autoconnect", "yes",
+            "ssid", &network.ssid])?;
 
         if !output.contains("successfully added") {
             Err(HotspotCreate(output))?
@@ -124,7 +124,7 @@ impl Hotspot for WiFi {
         }
 
         let output = self.command("nmcli", ["con", "modify",
-            "Hotspot", "wifi-sec.psk", network.password.as_str()])?;
+            "Hotspot", "wifi-sec.psk", &network.password])?;
 
         if !output.is_empty() {
             Err(HotspotCreate(output))?
@@ -146,7 +146,7 @@ impl Hotspot for WiFi {
     fn stop(&self) -> WFResult<()> {
         let output = self.command("nmcli", ["con", "down", "Hotspot"])?;
 
-        if !output.contains("Connection successfully activated") {
+        if !output.contains("successfully deactivated") {
             Err(HotspotCreate(output))?
         }
 
