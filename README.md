@@ -26,3 +26,7 @@ fn main() -> Result<(), WFError> {
 }
 ```
 Check out this at [examples/waifai.rs](examples/waifai.rs).
+
+## Documentation
+The documentation is available at [docs.rs](https://docs.rs/waifai/latest/waifai/).  
+Curious about the history and what changed between versions? Everything is in the [CHANGELOG](CHANGELOG.md) file.
