@@ -113,7 +113,7 @@ impl Hotspot for WiFi {
         }
 
         let output = self.command("nmcli", ["con", "modify",
-            "Hotspot", "wifi-sec.psk", network.password])?;
+            "Hotspot", "wifi-sec.psk", network.password.as_str()])?;
 
         if !output.is_empty() {
             Err(HotspotCreate)?
