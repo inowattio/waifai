@@ -1,9 +1,13 @@
-use crate::error::WFResult;
+use std::ffi::OsStr;
+use std::process::Command;
+use crate::error::{WFError, WFResult};
+use crate::error::WFError::HotspotCreate;
 
 mod error;
 
 struct Network {
     ssid: String,
+    password: String,
 }
 
 pub trait Client {
@@ -28,14 +32,32 @@ pub struct WiFi {
 }
 
 impl WiFi {
-    fn new(interface: String) -> Self {
+    pub fn new(interface: String) -> Self {
         Self {
             interface
         }
     }
 
-    fn interfaces() -> Vec<String> {
+    pub fn interfaces() -> Vec<String> {
         vec!["lol".to_string()]
+    }
+
+    fn interface(&self) -> String {
+        self.interface.clone()
+    }
+
+    fn command<I, S>(&self, program: &str, args: I) -> WFResult<String>
+    where I: IntoIterator<Item = S>,
+          S: AsRef<OsStr>
+    {
+        let output = Command::new(program)
+            .args(args)
+            .output()
+            .map_err(|err| WFError::CommandIO)?;
+
+        Ok(String::from_utf8_lossy(&output.stdout)
+            .parse()
+            .map_err(|err| WFError::CommandParse)?)
     }
 }
 
@@ -67,7 +89,43 @@ impl Client for WiFi {
 
 impl Hotspot for WiFi {
     fn create(&self, network: Network) -> WFResult<()> {
-        todo!()
+        let output = self.command("nmcli", ["con", "add", "type", "wifi",
+            "ifname", self.interface.as_str(), "con-name", "Hotspot", "autoconnect", "yes",
+            "ssid", network.ssid.as_str()])?;
+
+        if !output.contains("successfully added") {
+            Err(HotspotCreate)?
+        }
+
+        let output = self.command("nmcli", ["con", "modify",
+            "Hotspot", "802-11-wireless.mode", "ap", "802-11-wireless.band", "bg",
+            "ipv4.method shared"])?;
+
+        if !output.is_empty() {
+            Err(HotspotCreate)?
+        }
+
+        let output = self.command("nmcli", ["con", "modify",
+            "Hotspot", "wifi-sec.key-mgmt", "wpa-psk"])?;
+
+        if !output.is_empty() {
+            Err(HotspotCreate)?
+        }
+
+        let output = self.command("nmcli", ["con", "modify",
+            "Hotspot", "wifi-sec.psk", network.password])?;
+
+        if !output.is_empty() {
+            Err(HotspotCreate)?
+        }
+
+        let output = self.command("nmcli", ["con", "up", "Hotspot"])?;
+
+        if !output.contains("Connection successfully activated") {
+            Err(HotspotCreate)?
+        }
+
+        Ok(())
     }
 
     fn start(&self) -> WFResult<()> {
