@@ -12,15 +12,15 @@ pub struct WiFi {
 }
 
 impl WiFi {
+    /// Create a new Wi-Fi instance, pass the interface name, not that this is not checked and
+    /// might break during operations.
     pub fn new(interface: String) -> Self {
         Self {
             interface
         }
     }
 
-    pub fn interfaces() -> Vec<String> {
-        vec!["lol".to_string()]
-    }
+    // fn interfaces() -> WFResult<Vec<String>> {}
 
     fn command<I, S>(&self, program: &str, args: I) -> WFResult<String>
         where I: IntoIterator<Item = S>,
