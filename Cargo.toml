@@ -1,6 +1,6 @@
 [package]
 name = "waifai"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2021"
 authors = ["CosminPerRam [https://github.com/CosminPerRam]"]
 license = "MIT"
