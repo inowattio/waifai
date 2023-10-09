@@ -243,18 +243,20 @@ impl Hotspot for WiFi {
             Err(HotspotCreate(output))?
         }
 
-        let output = self.command("nmcli", ["con", "modify",
-            "Hotspot", "wifi-sec.key-mgmt", "wpa-psk"])?;
+        if let Some(password) = password {
+            let output = self.command("nmcli", ["con", "modify",
+                "Hotspot", "wifi-sec.key-mgmt", "wpa-psk"])?;
 
-        if !output.is_empty() {
-            Err(HotspotCreate(output))?
-        }
+            if !output.is_empty() {
+                Err(HotspotCreate(output))?
+            }
 
-        let output = self.command("nmcli", ["con", "modify",
-            "Hotspot", "wifi-sec.psk", &password.unwrap_or("parola_default".to_string())])?;
+            let output = self.command("nmcli", ["con", "modify",
+                "Hotspot", "wifi-sec.psk", &password])?;
 
-        if !output.is_empty() {
-            Err(HotspotCreate(output))?
+            if !output.is_empty() {
+                Err(HotspotCreate(output))?
+            }
         }
 
         Ok(())
