@@ -5,7 +5,12 @@ edition = "2021"
 authors = ["CosminPerRam [https://github.com/CosminPerRam]"]
 license = "MIT"
 description = "Interface with WiFi networks."
+homepage = "github.com/cosminperram/waifai"
+documentation = "https://docs.rs/waifai/latest/waifai/"
+repository = "github.com/cosminperram/waifai"
 readme = "README.md"
+keywords = ["wifi", "hotspot", "nmcli"]
+rust-version = "1.56.1"
 categories = ["network-programming"]
 
 [features]
