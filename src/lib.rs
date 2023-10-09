@@ -7,16 +7,15 @@ pub mod error;
 
 #[derive(Debug)]
 pub struct Network {
-    connected: bool,
-    bssid: String,
-    ssid: String,
-    mode: String,
-    channel: u32,
-    rate: String,
-    signal: u32,
-    security: String,
+    pub connected: bool,
+    pub bssid: String,
+    pub ssid: String,
+    pub mode: String,
+    pub channel: u32,
+    pub rate: String,
+    pub signal: u32,
+    pub security: String,
 }
-
 
 pub trait Client {
     fn connect(&self, ssid: String, password: Option<String>) -> WFResult<bool>;
