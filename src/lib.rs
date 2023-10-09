@@ -3,9 +3,9 @@ use std::process::Command;
 use crate::error::{WFError, WFResult};
 use crate::error::WFError::HotspotCreate;
 
-mod error;
+pub mod error;
 
-struct Network {
+pub struct Network {
     ssid: String,
     password: String,
 }
