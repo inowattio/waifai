@@ -20,12 +20,13 @@ pub struct Network {
 
 pub trait Client {
     fn connect(&self, ssid: String, password: Option<String>) -> WFResult<bool>;
-    fn disconnect(&self) -> WFResult<()>;
+    fn disconnect(&self) -> WFResult<bool>;
     fn turn_off(&self) -> WFResult<()>;
     fn turn_on(&self) -> WFResult<()>;
     fn is_on(&self) -> WFResult<bool>;
-    fn scan(&self, forceRescan: bool) -> WFResult<Vec<Network>>;
-    fn connected(&self) -> WFResult<Option<Network>>;
+    fn scan(&self, force_rescan: bool) -> WFResult<Vec<Network>>;
+    fn connected_network(&self) -> WFResult<Option<Network>>;
+    fn is_connected(&self) -> WFResult<bool>;
 }
 
 pub trait Hotspot {
@@ -97,14 +98,18 @@ impl Client for WiFi {
         Ok(true)
     }
 
-    fn disconnect(&self) -> WFResult<()> {
+    fn disconnect(&self) -> WFResult<bool> {
+        if !self.is_connected()? {
+            return Ok(false);
+        }
+
         let output = self.command("nmcli", ["device", "disconnect", "wlan0"])?;
 
         if !output.contains("successfully disconnected") {
             Err(WifiAction(output))?
         }
 
-        Ok(())
+        Ok(true)
     }
 
     fn turn_off(&self) -> WFResult<()> {
@@ -190,7 +195,11 @@ impl Client for WiFi {
         Ok(networks)
     }
 
-    fn connected(&self) -> WFResult<Option<Network>> {
+    fn connected_network(&self) -> WFResult<Option<Network>> {
+        if !self.is_connected()? {
+            return Ok(None);
+        }
+
         let networks = self.scan(false)?;
 
         for network in networks {
@@ -200,6 +209,20 @@ impl Client for WiFi {
         }
 
         Ok(None)
+    }
+
+    fn is_connected(&self) -> WFResult<bool> {
+        let output = self.command("nmcli", ["--fields", "DEVICE,STATE",
+            "device", "status"])?;
+        let output = output.lines();
+
+        for line in output {
+            if line.starts_with(&self.interface) {
+                return Ok(!line.contains("disconnected"))
+            }
+        }
+
+        Ok(false)
     }
 }
 
