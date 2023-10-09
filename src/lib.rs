@@ -20,9 +20,9 @@ pub struct Network {
 pub trait Client {
     fn connect(&self, ssid: String, password: Option<String>) -> WFResult<bool>;
     fn disconnect(&self) -> WFResult<bool>;
-    fn turn_off(&self) -> WFResult<()>;
-    fn turn_on(&self) -> WFResult<()>;
-    fn is_on(&self) -> WFResult<bool>;
+    // fn turn_off(&self) -> WFResult<()>;
+    // fn turn_on(&self) -> WFResult<()>;
+    // fn is_on(&self) -> WFResult<bool>;
     fn scan(&self, force_rescan: bool) -> WFResult<Vec<Network>>;
     fn connected_network(&self) -> WFResult<Option<Network>>;
     fn is_connected(&self) -> WFResult<bool>;
@@ -32,8 +32,8 @@ pub trait Hotspot {
     fn create(&self, ssid: String, password: Option<String>) -> WFResult<()>;
     fn start(&self) -> WFResult<()>;
     fn stop(&self) -> WFResult<()>;
-    fn clients(&self) -> WFResult<Vec<String>>;
-    fn is_active(&self) -> WFResult<bool>;
+    // fn clients(&self) -> WFResult<Vec<String>>;
+    // fn is_active(&self) -> WFResult<bool>;
 }
 
 pub struct WiFi {
@@ -109,18 +109,6 @@ impl Client for WiFi {
         }
 
         Ok(true)
-    }
-
-    fn turn_off(&self) -> WFResult<()> {
-        todo!()
-    }
-
-    fn turn_on(&self) -> WFResult<()> {
-        todo!()
-    }
-
-    fn is_on(&self) -> WFResult<bool> {
-        todo!()
     }
 
     fn scan(&self, force_rescan: bool) -> WFResult<Vec<Network>> {
@@ -280,13 +268,5 @@ impl Hotspot for WiFi {
         }
 
         Ok(())
-    }
-
-    fn clients(&self) -> WFResult<Vec<String>> {
-        todo!()
-    }
-
-    fn is_active(&self) -> WFResult<bool> {
-        todo!()
     }
 }
