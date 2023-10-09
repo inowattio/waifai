@@ -10,6 +10,15 @@ pub struct Network {
     password: String,
 }
 
+impl Network {
+    pub fn new(ssid: String, password: String) -> Self {
+        Self {
+            ssid,
+            password
+        }
+    }
+}
+
 pub trait Client {
     fn connect(&self, network: &Network) -> WFResult<()>;
     fn disconnect(&self) -> WFResult<()>;
