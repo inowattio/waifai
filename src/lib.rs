@@ -1,7 +1,7 @@
 use std::ffi::OsStr;
 use std::process::Command;
 use crate::error::{WFError, WFResult};
-use crate::error::WFError::HotspotCreate;
+use crate::error::WFError::{CommandErr, HotspotCreate};
 
 pub mod error;
 
@@ -62,11 +62,19 @@ impl WiFi {
         let output = Command::new(program)
             .args(args)
             .output()
-            .map_err(|err| WFError::CommandIO)?;
+            .map_err(|_| WFError::CommandIO)?;
+
+        let err: String = String::from_utf8_lossy(&output.stderr)
+            .parse()
+            .map_err(|_| WFError::CommandParse)?;
+
+        if !err.is_empty() {
+            Err(CommandErr(err))?
+        }
 
         let string: String = String::from_utf8_lossy(&output.stdout)
             .parse()
-            .map_err(|err| WFError::CommandParse)?;
+            .map_err(|_| WFError::CommandParse)?;
 
         Ok(string.trim().to_string())
     }
@@ -110,7 +118,7 @@ impl Hotspot for WiFi {
 
         let output = self.command("nmcli", ["con", "modify",
             "Hotspot", "802-11-wireless.mode", "ap", "802-11-wireless.band", "bg",
-            "ipv4.method shared"])?;
+            "ipv4.method", "shared"])?;
 
         if !output.is_empty() {
             Err(HotspotCreate(output))?
