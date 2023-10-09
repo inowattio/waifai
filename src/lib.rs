@@ -51,10 +51,6 @@ impl WiFi {
         vec!["lol".to_string()]
     }
 
-    fn interface(&self) -> String {
-        self.interface.clone()
-    }
-
     fn command<I, S>(&self, program: &str, args: I) -> WFResult<String>
     where I: IntoIterator<Item = S>,
           S: AsRef<OsStr>
