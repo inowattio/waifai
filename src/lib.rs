@@ -119,6 +119,10 @@ impl Hotspot for WiFi {
             Err(HotspotCreate)?
         }
 
+        Ok(())
+    }
+
+    fn start(&self) -> WFResult<()> {
         let output = self.command("nmcli", ["con", "up", "Hotspot"])?;
 
         if !output.contains("Connection successfully activated") {
@@ -128,12 +132,14 @@ impl Hotspot for WiFi {
         Ok(())
     }
 
-    fn start(&self) -> WFResult<()> {
-        todo!()
-    }
-
     fn stop(&self) -> WFResult<()> {
-        todo!()
+        let output = self.command("nmcli", ["con", "down", "Hotspot"])?;
+
+        if !output.contains("Connection successfully activated") {
+            Err(HotspotCreate)?
+        }
+
+        Ok(())
     }
 
     fn clients(&self) -> WFResult<Vec<String>> {
