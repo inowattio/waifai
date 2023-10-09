@@ -64,9 +64,11 @@ impl WiFi {
             .output()
             .map_err(|err| WFError::CommandIO)?;
 
-        Ok(String::from_utf8_lossy(&output.stdout)
+        let string: String = String::from_utf8_lossy(&output.stdout)
             .parse()
-            .map_err(|err| WFError::CommandParse)?)
+            .map_err(|err| WFError::CommandParse)?;
+
+        Ok(string.replace("\n", ""))
     }
 }
 
