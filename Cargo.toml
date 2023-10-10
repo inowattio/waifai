@@ -2,12 +2,12 @@
 name = "waifai"
 version = "0.1.0"
 edition = "2021"
-authors = ["CosminPerRam [https://github.com/CosminPerRam]"]
+authors = ["CosminPerRam [https://github.com/CosminPerRam]", "Inowattio [https://github.com/inowattio]"]
 license = "MIT"
 description = "Interface with Wi-Fi networks."
-homepage = "https://github.com/cosminperram/waifai"
+homepage = "https://github.com/inowattio"
 documentation = "https://docs.rs/waifai/latest/waifai/"
-repository = "https://github.com/cosminperram/waifai"
+repository = "https://github.com/inowattio"
 readme = "README.md"
 keywords = ["wifi", "hotspot", "nmcli"]
 rust-version = "1.56.1"
