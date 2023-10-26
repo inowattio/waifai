@@ -5,7 +5,7 @@ pub trait Hotspot {
     /// this method doesnt start the hotspot, that's handled by [crate](Hotspot::create).
     /// Note that this creates a new connection every time the function is used (will solve).
     // TODO: Fix above.
-    fn create(&self, ssid: String, password: Option<String>) -> WFResult<()>;
+    fn create(&self, ssid: &str, password: Option<&str>) -> WFResult<()>;
     /// Starts the previously created hotspot, this is not blocking.
     /// Doesn't fail if the hotspot is already created.
     fn start(&self) -> WFResult<()>;

@@ -5,7 +5,7 @@ pub trait Client {
     /// Connect to a network, password is optional as you can connect to networks with no passwords.
     /// Passing a password for a unsecured network doesn't yield in errors/interruptions.
     /// Returns wether the connection was made or not.
-    fn connect(&self, ssid: String, password: Option<String>) -> WFResult<bool>;
+    fn connect(&self, ssid: &str, password: Option<&str>) -> WFResult<bool>;
     /// Disconnects from the currently connected network, returns wether the device disconnected
     /// or not (this isn't an error, if you weren't connected to a network beforehand, you didn't
     /// disconnect from any.

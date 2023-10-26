@@ -48,7 +48,7 @@ impl WiFi {
 }
 
 impl Client for WiFi {
-    fn connect(&self, ssid: String, password: Option<String>) -> WFResult<bool> {
+    fn connect(&self, ssid: &str, password: Option<&str>) -> WFResult<bool> {
         let password_arg: &str = match password.as_ref() {
             None => "nopassword",
             Some(password) => password
@@ -185,7 +185,7 @@ impl Client for WiFi {
 }
 
 impl Hotspot for WiFi {
-    fn create(&self, ssid: String, password: Option<String>) -> WFResult<()> {
+    fn create(&self, ssid: &str, password: Option<&str>) -> WFResult<()> {
         let id = "Hotspot"; // TODO: dynamic ids/use uuid
         let _ = self.command("nmcli", ["con", "delete", id]);
 
