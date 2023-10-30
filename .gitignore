@@ -15,3 +15,7 @@ Cargo.lock
 
 # Personally added
 .idea/
+
+# Sometimes I do run examples on other devices that require cross compilation.
+# This is ignored due to my proprietary config for those.
+.cargo/
