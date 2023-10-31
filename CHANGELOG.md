@@ -1,5 +1,9 @@
 
-# 0.X.Y - DD/MM/YYY
+# 0.X.Y - DD/MM/YYYY
+### Changes:
+- None, yet.
+
+# 0.1.1 - 31/10/2023
 ### Changes:
 - Added the `serde` feature flag, it is disabled by default, enables serde Serialize/Deserialize on used types.
 
