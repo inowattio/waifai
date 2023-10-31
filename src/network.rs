@@ -1,5 +1,8 @@
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// A discovered network.
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Network {
     /// Wether this network is connected right now.
