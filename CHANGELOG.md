@@ -1,7 +1,10 @@
 
 # 0.X.Y - DD/MM/YYY
 ### Changes:
-Nothing, yet.
+- Added the `serde` feature flag, it is disabled by default, enables serde Serialize/Deserialize on used types.
+
+### Breaking:
+- Replace `String` parameters with `&str`.
 
 # 0.1.0 - 09/10/2023
 The first usable version of the crate, yay!
