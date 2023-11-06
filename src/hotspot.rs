@@ -8,9 +8,12 @@ pub trait Hotspot {
     fn create(&self, ssid: &str, password: Option<&str>) -> WFResult<()>;
     /// Starts the previously created hotspot, this is not blocking.
     /// Doesn't fail if the hotspot is already created.
+
     fn start(&self) -> WFResult<()>;
     /// Stops created hotspot.
     fn stop(&self) -> WFResult<()>;
     // fn clients(&self) -> WFResult<Vec<String>>;
-    // fn is_active(&self) -> WFResult<bool>;
+
+    /// Returns if the current interface is running a hotspot.
+    fn is_active(&self) -> WFResult<bool>;
 }

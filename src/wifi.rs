@@ -242,4 +242,10 @@ impl Hotspot for WiFi {
 
         Ok(())
     }
+
+    fn is_active(&self) -> WFResult<bool> {
+        let output = self.command("nmcli", ["con", "show", "--active"])?;
+
+        Ok(output.contains("Hotspot"))
+    }
 }
