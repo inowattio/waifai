@@ -1,6 +1,10 @@
 
 # 0.X.Y - DD/MM/YYYY
 ### Changes:
+Nothing, yet...
+
+# 0.1.2 - 06/11/2023
+### Changes:
 - Added `is_active` on Hotspot to check if the interface currently runs the hotspot.
 
 # 0.1.1 - 31/10/2023
