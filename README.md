@@ -20,6 +20,7 @@ fn main() -> Result<(), WFError> {
         wifi.disconnect()?;
     } else {
         wifi.create(&my_favorite_network.ssid, Some("password"))?;
+        wifi.start()?;
     }
 
     Ok(())
