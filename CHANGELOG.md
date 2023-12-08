@@ -3,6 +3,11 @@
 ### Changes:
 Nothing, yet...
 
+# 0.1.3 - 08/12/2023
+### Changes:
+- Implemented `std::Error` on `WFError`.
+- Fixed `repository` crate link.
+
 # 0.1.2 - 06/11/2023
 ### Changes:
 - Added `is_active` on Hotspot to check if the interface currently runs the hotspot.
