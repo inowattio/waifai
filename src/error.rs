@@ -1,3 +1,6 @@
+use std::error::Error;
+use std::fmt;
+use std::fmt::{Display, Formatter};
 
 pub type WFResult<T> = Result<T, WFError>;
 
@@ -9,3 +12,9 @@ pub enum WFError {
     WifiAction(String),
     HotspotCreate(String),
 }
+
+impl Display for WFError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result { write!(f, "{:?}", self) }
+}
+
+impl Error for WFError {}
