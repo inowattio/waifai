@@ -1,7 +1,7 @@
 use std::ffi::OsStr;
 use std::process::Command;
 use crate::client::Client;
-use crate::error::WFError::{CommandErr, HotspotCreate, WifiAction};
+use crate::error::WFError::{CommandErr, CommandParse, HotspotCreate, CommandIO, WifiAction};
 use crate::error::{WFError, WFResult};
 use crate::hotspot::Hotspot;
 use crate::network::Network;
@@ -18,11 +18,11 @@ where I: IntoIterator<Item = S>,
     let output = Command::new(program)
         .args(args)
         .output()
-        .map_err(|_| WFError::CommandIO)?;
+        .map_err(|_| CommandIO)?;
 
     let err: String = String::from_utf8_lossy(&output.stderr)
         .parse()
-        .map_err(|_| WFError::CommandParse)?;
+        .map_err(|_| CommandParse)?;
 
     if !err.is_empty() {
         Err(CommandErr(err))?
@@ -42,7 +42,7 @@ fn make_table<const N: usize>(data: String) -> WFResult<Vec<[String; N]>> {
     let mut words: Vec<String> = Vec::new();
     let mut current_word = String::new();
     let mut in_whitespace = false;
-    let header = output.next().unwrap();
+    let header = output.next().ok_or(CommandParse)?;
 
     for c in header.chars() {
         if c.is_whitespace() {
