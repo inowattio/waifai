@@ -11,6 +11,76 @@ pub struct WiFi {
     interface: String,
 }
 
+pub fn command<I, S>(program: &str, args: I) -> WFResult<String>
+where I: IntoIterator<Item = S>,
+      S: AsRef<OsStr>
+{
+    let output = Command::new(program)
+        .args(args)
+        .output()
+        .map_err(|_| WFError::CommandIO)?;
+
+    let err: String = String::from_utf8_lossy(&output.stderr)
+        .parse()
+        .map_err(|_| WFError::CommandParse)?;
+
+    if !err.is_empty() {
+        Err(CommandErr(err))?
+    }
+
+    let string: String = String::from_utf8_lossy(&output.stdout)
+        .parse()
+        .map_err(|_| WFError::CommandParse)?;
+
+    Ok(string.trim().to_string())
+}
+
+fn make_table<const N: usize>(data: String) -> WFResult<Vec<[String; N]>> {
+    let output = data.lines().collect::<Vec<&str>>();
+    let mut output = output.iter();
+
+    let mut words: Vec<String> = Vec::new();
+    let mut current_word = String::new();
+    let mut in_whitespace = false;
+    let header = output.next().unwrap();
+
+    for c in header.chars() {
+        if c.is_whitespace() {
+            current_word.push(c);
+            in_whitespace = true;
+        } else {
+            if in_whitespace {
+                words.push(current_word.clone());
+                current_word.clear();
+            }
+
+            current_word.push(c);
+            in_whitespace = false;
+        }
+    }
+
+    // Add the last word if there's one
+    if !current_word.is_empty() {
+        words.push(current_word.clone());
+    }
+
+    let mut table = Vec::new();
+    for line in output.by_ref() {
+        let mut index = 0;
+        let mut row = [(); N].map(|_| String::new());
+        for i in 0..(N - 1) {
+            row[i] = line[index..index + words[i].len()].trim().to_string();
+            index += words[i].len();
+        }
+
+        row[N - 1] = line[index..].trim().to_string();
+
+        table.push(row);
+    }
+
+    Ok(table)
+}
+
 impl WiFi {
     /// Create a new Wi-Fi instance, pass the interface name, not that this is not checked and
     /// might break during operations.
@@ -20,30 +90,13 @@ impl WiFi {
         }
     }
 
-    // fn interfaces() -> WFResult<Vec<String>> {}
-
-    fn command<I, S>(&self, program: &str, args: I) -> WFResult<String>
-        where I: IntoIterator<Item = S>,
-              S: AsRef<OsStr>
-    {
-        let output = Command::new(program)
-            .args(args)
-            .output()
-            .map_err(|_| WFError::CommandIO)?;
-
-        let err: String = String::from_utf8_lossy(&output.stderr)
-            .parse()
-            .map_err(|_| WFError::CommandParse)?;
-
-        if !err.is_empty() {
-            Err(CommandErr(err))?
-        }
-
-        let string: String = String::from_utf8_lossy(&output.stdout)
-            .parse()
-            .map_err(|_| WFError::CommandParse)?;
-
-        Ok(string.trim().to_string())
+    pub fn interfaces() -> WFResult<Vec<String>> {
+        let output = command("nmcli", ["dev"])?;
+        Ok(make_table::<4>(output)?
+            .into_iter()
+            .filter(|row| row[1] == "wifi")
+            .map(|row| row[0].clone())
+            .collect())
     }
 }
 
@@ -54,7 +107,7 @@ impl Client for WiFi {
             Some(password) => password
         };
 
-        let output = self.command("nmcli", &["device", "wifi", "connect",
+        let output = command("nmcli", &["device", "wifi", "connect",
             &ssid, "password", password_arg, "ifname", &self.interface])?;
 
         if output.contains("Secrets were required") {
@@ -73,7 +126,7 @@ impl Client for WiFi {
             return Ok(false);
         }
 
-        let output = self.command("nmcli", ["device", "disconnect", "wlan0"])?;
+        let output = command("nmcli", ["device", "disconnect", "wlan0"])?;
 
         if !output.contains("successfully disconnected") {
             Err(WifiAction(output))?
@@ -88,69 +141,22 @@ impl Client for WiFi {
             false => "no"
         };
 
-        let output = self.command("nmcli", ["device", "wifi", "list",
+        let output = command("nmcli", ["device", "wifi", "list",
             "ifname", &self.interface, "--rescan", force_rescan])?;
 
-        let output = output.lines().collect::<Vec<&str>>();
-        let mut output = output.iter();
-
-        let mut words: Vec<String> = Vec::new();
-        let mut current_word = String::new();
-        let mut in_whitespace = false;
-        let header = output.next().unwrap();
-
-        for c in header.chars() {
-            if c.is_whitespace() {
-                current_word.push(c);
-                in_whitespace = true;
-            } else {
-                if in_whitespace {
-                    words.push(current_word.clone());
-                    current_word.clear();
-                }
-
-                current_word.push(c);
-                in_whitespace = false;
-            }
-        }
-
-        // Add the last word if there's one
-        if !current_word.is_empty() {
-            words.push(current_word.clone());
-        }
-
-        let mut networks = Vec::new();
-        for line in output.by_ref() {
-            let mut index = 0;
-            let connected = line[index..index + words[0].len()].trim().to_string().contains('*');
-            index += words[0].len();
-            let bssid = line[index..index + words[1].len()].trim().to_string();
-            index += words[1].len();
-            let ssid = line[index..index + words[2].len()].trim().to_string();
-            index += words[2].len();
-            let mode = line[index..index + words[3].len()].trim().to_string();
-            index += words[3].len();
-            let channel = line[index..index + words[4].len()].trim().to_string().parse().unwrap_or(0);
-            index += words[4].len();
-            let rate = line[index..index + words[5].len()].trim().to_string();
-            index += words[5].len();
-            let signal = line[index..index + words[6].len()].trim().to_string().parse().unwrap_or(0);
-            index += words[6].len() + words[7].len();
-            let security = line[index..].trim().to_string();
-
-            networks.push(Network {
-                connected,
-                bssid,
-                ssid,
-                mode,
-                channel,
-                rate,
-                signal,
-                security,
+        Ok(make_table::<8>(output)?
+            .into_iter()
+            .map(|row| Network {
+                connected: row[0].contains("*"),
+                bssid: row[1].clone(),
+                ssid: row[2].clone(),
+                mode: row[3].clone(),
+                channel: row[4].parse().unwrap_or(0),
+                rate: row[5].clone(),
+                signal: row[6].parse().unwrap_or(0),
+                security: row[7].clone(),
             })
-        }
-
-        Ok(networks)
+            .collect())
     }
 
     fn connected_network(&self) -> WFResult<Option<Network>> {
@@ -170,7 +176,7 @@ impl Client for WiFi {
     }
 
     fn is_connected(&self) -> WFResult<bool> {
-        let output = self.command("nmcli", ["--fields", "DEVICE,STATE",
+        let output = command("nmcli", ["--fields", "DEVICE,STATE",
             "device", "status"])?;
         let output = output.lines();
 
@@ -187,16 +193,16 @@ impl Client for WiFi {
 impl Hotspot for WiFi {
     fn create(&self, ssid: &str, password: Option<&str>) -> WFResult<()> {
         let id = "Hotspot"; // TODO: dynamic ids/use uuid
-        let _ = self.command("nmcli", ["con", "delete", id]);
+        let _ = command("nmcli", ["con", "delete", id]);
 
-        let output = self.command("nmcli", ["con", "add", "type", "wifi",
+        let output = command("nmcli", ["con", "add", "type", "wifi",
             "ifname", &self.interface, "con-name", id, "autoconnect", "yes", "ssid", &ssid])?;
 
         if !output.contains("successfully added") {
             Err(HotspotCreate(output))?
         }
 
-        let output = self.command("nmcli", ["con", "modify",
+        let output = command("nmcli", ["con", "modify",
             "Hotspot", "802-11-wireless.mode", "ap", "802-11-wireless.band", "bg",
             "ipv4.method", "shared"])?;
 
@@ -205,14 +211,14 @@ impl Hotspot for WiFi {
         }
 
         if let Some(password) = password {
-            let output = self.command("nmcli", ["con", "modify",
+            let output = command("nmcli", ["con", "modify",
                 "Hotspot", "wifi-sec.key-mgmt", "wpa-psk"])?;
 
             if !output.is_empty() {
                 Err(HotspotCreate(output))?
             }
 
-            let output = self.command("nmcli", ["con", "modify",
+            let output = command("nmcli", ["con", "modify",
                 "Hotspot", "wifi-sec.psk", &password])?;
 
             if !output.is_empty() {
@@ -224,7 +230,7 @@ impl Hotspot for WiFi {
     }
 
     fn start(&self) -> WFResult<()> {
-        let output = self.command("nmcli", ["con", "up", "Hotspot"])?;
+        let output = command("nmcli", ["con", "up", "Hotspot"])?;
 
         if !output.contains("Connection successfully activated") {
             Err(HotspotCreate(output))?
@@ -234,7 +240,7 @@ impl Hotspot for WiFi {
     }
 
     fn stop(&self) -> WFResult<()> {
-        let output = self.command("nmcli", ["con", "down", "Hotspot"])?;
+        let output = command("nmcli", ["con", "down", "Hotspot"])?;
 
         if !output.contains("successfully deactivated") {
             Err(HotspotCreate(output))?
@@ -244,7 +250,7 @@ impl Hotspot for WiFi {
     }
 
     fn is_active(&self) -> WFResult<bool> {
-        let output = self.command("nmcli", ["con", "show", "--active"])?;
+        let output = command("nmcli", ["con", "show", "--active"])?;
 
         Ok(output.contains("Hotspot"))
     }
