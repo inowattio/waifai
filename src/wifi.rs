@@ -126,7 +126,7 @@ impl Client for WiFi {
             return Ok(false);
         }
 
-        let output = command("nmcli", ["device", "disconnect", "wlan0"])?;
+        let output = command("nmcli", ["device", "disconnect", &self.interface])?;
 
         if !output.contains("successfully disconnected") {
             Err(WifiAction(output))?
