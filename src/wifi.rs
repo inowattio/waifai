@@ -107,8 +107,8 @@ impl Client for WiFi {
             Some(password) => password
         };
 
-        let output = command("nmcli", &["device", "wifi", "connect",
-            &ssid, "password", password_arg, "ifname", &self.interface])?;
+        let output = command("nmcli", ["device", "wifi", "connect",
+            ssid, "password", password_arg, "ifname", &self.interface])?;
 
         if output.contains("Secrets were required") {
             return Ok(false);
@@ -196,7 +196,7 @@ impl Hotspot for WiFi {
         let _ = command("nmcli", ["con", "delete", id]);
 
         let output = command("nmcli", ["con", "add", "type", "wifi",
-            "ifname", &self.interface, "con-name", id, "autoconnect", "yes", "ssid", &ssid])?;
+            "ifname", &self.interface, "con-name", id, "autoconnect", "yes", "ssid", ssid])?;
 
         if !output.contains("successfully added") {
             Err(HotspotCreate(output))?
@@ -219,7 +219,7 @@ impl Hotspot for WiFi {
             }
 
             let output = command("nmcli", ["con", "modify",
-                "Hotspot", "wifi-sec.psk", &password])?;
+                "Hotspot", "wifi-sec.psk", password])?;
 
             if !output.is_empty() {
                 Err(HotspotCreate(output))?
