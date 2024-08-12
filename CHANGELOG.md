@@ -3,6 +3,12 @@
 ### Changes:
 Nothing, yet...
 
+# 0.1.4 - 12/08/2024
+### Changes:
+- Fixed unhandled `.unwrap()`.
+- Fixed ifname wlan0 always being used in `disconnect`.
+- Added interfaces fetching
+
 # 0.1.3 - 08/12/2023
 ### Changes:
 - Implemented `std::Error` on `WFError`.
