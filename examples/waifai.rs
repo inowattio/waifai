@@ -2,7 +2,9 @@ use waifai::*;
 use waifai::error::WFError;
 
 fn main() -> Result<(), WFError> {
-    let wifi = WiFi::new("wlan0".to_string());
+    let interfaces = WiFi::interfaces()?;
+    let my_interface = interfaces.first().unwrap().clone();
+    let wifi = WiFi::new(my_interface);
 
     let networks = wifi.scan(true)?; // the argument forces a rescan or loading from cache
     let my_favorite_network = networks.first().unwrap();
