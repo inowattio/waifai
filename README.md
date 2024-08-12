@@ -7,11 +7,13 @@ This is a library to interact with everything related to Wi-Fi: scan, connect, d
 Currently, only Linux is supported (via `nmcli`), but there are plans to also add Windows support.
 
 ## Usage
-Minimum Supported Rust Version is `1.56.1`.
+Minimum Supported Rust Version is `1.60.0`.
 ```rust
 fn main() -> Result<(), WFError> {
-    let wifi = WiFi::new("wlan0".to_string());
-
+    let interfaces = WiFi::interfaces()?;
+    let my_interface = interfaces.first().unwrap().clone();
+    let wifi = WiFi::new(my_interface);
+    
     let networks = wifi.scan(true)?; // the argument forces a rescan or loading from cache
     let my_favorite_network = networks.first().unwrap();
     let connected = wifi.connect(&my_favorite_network.ssid, Some("my_password"))?;
