@@ -178,11 +178,11 @@ impl Client for WiFi {
     fn is_connected(&self) -> WFResult<bool> {
         let output = command("nmcli", ["--fields", "DEVICE,STATE",
             "device", "status"])?;
-        let output = output.lines();
+        let entries = make_table::<2>(output)?;
 
-        for line in output {
-            if line.starts_with(&self.interface) {
-                return Ok(!line.contains("disconnected"))
+        for [device, status] in entries {
+            if device == self.interface {
+                return Ok(status == "connected");
             }
         }
 
