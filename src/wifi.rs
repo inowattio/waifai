@@ -91,11 +91,18 @@ impl WiFi {
     }
 
     pub fn interfaces() -> WFResult<Vec<String>> {
+        let interfaces = Self::all_interfaces()?;
+        Ok(interfaces.into_iter()
+            .filter(|(_, kind)| kind == "wifi")
+            .map(|(device, _)| device)
+            .collect())
+    }
+
+    pub fn all_interfaces() -> WFResult<Vec<(String, String)>> {
         let output = command("nmcli", ["dev"])?;
         Ok(make_table::<4>(output)?
             .into_iter()
-            .filter(|row| row[1] == "wifi")
-            .map(|row| row[0].clone())
+            .map(|row| (row[0].clone(), row[1].clone()))
             .collect())
     }
 }
