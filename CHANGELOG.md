@@ -3,6 +3,10 @@
 ### Changes:
 Nothing, yet...
 
+# 0.1.5 - 30/08/2024
+### Changes:
+- Added `all_interfaces` method to get devices other than just type `wifi`.
+
 # 0.1.4 - 12/08/2024
 ### Changes:
 - Fixed unhandled `.unwrap()`.
