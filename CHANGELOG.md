@@ -1,7 +1,7 @@
 
 # 0.X.Y - DD/MM/YYYY
 ### Changes:
-Nothing, yet...
+- Added `interface` method to get the current interface of an instance.
 
 # 0.1.5 - 30/08/2024
 ### Changes:

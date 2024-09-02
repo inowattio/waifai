@@ -89,6 +89,10 @@ impl WiFi {
             interface
         }
     }
+    
+    pub fn interface(&self) -> &String {
+        &self.interface
+    }
 
     pub fn interfaces() -> WFResult<Vec<String>> {
         let interfaces = Self::all_interfaces()?;
