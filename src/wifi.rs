@@ -133,13 +133,15 @@ impl Client for WiFi {
     }
 
     fn disconnect(&self) -> WFResult<bool> {
-        if !self.is_connected()? {
-            return Ok(false);
-        }
+        let connection = match self.connected_network()? {
+            None => return Ok(false),
+            Some(connection) => connection
+        };
 
-        let output = command("nmcli", ["device", "disconnect", &self.interface])?;
+        let name = connection.ssid;
+        let output = command("nmcli", ["device", "disconnect", &format!("'{name}'")])?;
 
-        if !output.contains("successfully disconnected") {
+        if !output.contains("successfully deactivated") {
             Err(WifiAction(output))?
         }
 
