@@ -2,7 +2,7 @@ use crate::error::WFResult;
 
 pub trait Hotspot {
     /// Create a hotspot for the current interface, it may or may not have a password, note that
-    /// this method doesnt start the hotspot, that's handled by [crate](Hotspot::create).
+    /// this method doesn't start the hotspot, that's handled by [crate](Hotspot::create).
     /// Note that this creates a new connection every time the function is used (will solve).
     // TODO: Fix above.
     fn create(&self, ssid: &str, password: Option<&str>) -> WFResult<()>;

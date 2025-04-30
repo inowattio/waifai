@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Network {
-    /// Wether this network is connected right now.
+    /// Whether this network is connected right now.
     pub connected: bool,
     pub bssid: String,
     pub ssid: String,
