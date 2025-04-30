@@ -3,6 +3,14 @@
 ### Changes:
 Nothing, yet...
 
+# 0.2.0 - 30/04/2025
+### Changes:
+- Docs: fix misspellings
+- Feat: Disconnect by connection name
+- Fix: Guard connection-name using commands with ticks
+- Feat: Metrics get and set
+- Feat: Interface device typ
+
 # 0.1.6 - 02/09/2024
 ### Changes:
 - Added `interface` method to get the current interface of an instance.
