@@ -93,6 +93,31 @@ impl WiFi {
     pub fn interface(&self) -> &String {
         &self.interface
     }
+    
+    pub fn connection(&self) -> WFResult<String> {
+        command("nmcli", ["-g", "GENERAL.CONNECTION", "device", "show", &self.interface])
+    }
+    
+    pub fn metric(&self) -> WFResult<i16> {
+        let connection = self.connection()?;
+        let name = &format!("'{connection}'");
+        
+        let output = command("nmcli", ["-g", "ipv4.route-metric", "connection", "show", name])?;
+        output.parse().map_err(|_| WifiAction(output))
+    }
+    
+    pub fn set_metric(&self, value: i16) -> WFResult<()> {
+        let connection = self.connection()?;
+        let name = &format!("'{connection}'");
+        let value = &format!("{value}");
+        
+        let output = command("nmcli", ["connection", "modify", name, "ipv4.route-metric", value])?;
+        if !output.is_empty() {
+            return Err(WifiAction(output))
+        }
+        
+        Ok(())
+    }
 
     pub fn interfaces() -> WFResult<Vec<String>> {
         let interfaces = Self::all_interfaces()?;
