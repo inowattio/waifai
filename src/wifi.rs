@@ -139,8 +139,8 @@ impl Client for WiFi {
             Some(connection) => connection
         };
 
-        let name = connection.ssid;
-        let output = command("nmcli", ["device", "disconnect", &format!("'{name}'")])?;
+        let name = &format!("'{}'", connection.ssid);
+        let output = command("nmcli", ["connection", "down", name])?;
 
         if !output.contains("successfully deactivated") {
             Err(WifiAction(output))?
