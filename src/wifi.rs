@@ -118,8 +118,9 @@ impl Client for WiFi {
             Some(password) => password
         };
 
+        let name = &format!("'{ssid}'");
         let output = command("nmcli", ["device", "wifi", "connect",
-            ssid, "password", password_arg, "ifname", &self.interface])?;
+            name, "password", password_arg, "ifname", &self.interface])?;
 
         if output.contains("Secrets were required") {
             return Ok(false);
