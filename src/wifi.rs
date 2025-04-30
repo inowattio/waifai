@@ -1,3 +1,4 @@
+use std::cmp::PartialEq;
 use std::ffi::OsStr;
 use std::process::Command;
 use crate::client::Client;
@@ -5,6 +6,24 @@ use crate::error::WFError::{CommandErr, CommandParse, HotspotCreate, CommandIO, 
 use crate::error::{WFError, WFResult};
 use crate::hotspot::Hotspot;
 use crate::network::Network;
+
+#[derive(PartialEq, Eq, Debug)]
+pub enum DeviceType {
+    Wifi,
+    Ethernet,
+    Other(String)
+}
+
+impl DeviceType {
+    pub fn new<S: Into<String>>(name: S) -> Self {
+        let name = name.into().to_ascii_lowercase();
+        match name.as_ref() {
+            "wifi" => Self::Wifi,
+            "ethernet" => Self::Ethernet,
+            _ => Self::Other(name)
+        }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct WiFi {
@@ -82,8 +101,8 @@ fn make_table<const N: usize>(data: String) -> WFResult<Vec<[String; N]>> {
 }
 
 impl WiFi {
-    /// Create a new Wi-Fi instance, pass the interface name, not that this is not checked and
-    /// might break during operations.
+    /// Create a new Wi-Fi instance, pass the interface name.
+    /// Note: that this is not checked and might break during operations.
     pub fn new(interface: String) -> Self {
         Self {
             interface
@@ -122,16 +141,16 @@ impl WiFi {
     pub fn interfaces() -> WFResult<Vec<String>> {
         let interfaces = Self::all_interfaces()?;
         Ok(interfaces.into_iter()
-            .filter(|(_, kind)| kind == "wifi")
+            .filter(|(_, kind)| *kind == DeviceType::Wifi)
             .map(|(device, _)| device)
             .collect())
     }
 
-    pub fn all_interfaces() -> WFResult<Vec<(String, String)>> {
+    pub fn all_interfaces() -> WFResult<Vec<(String, DeviceType)>> {
         let output = command("nmcli", ["dev"])?;
         Ok(make_table::<4>(output)?
             .into_iter()
-            .map(|row| (row[0].clone(), row[1].clone()))
+            .map(|row| (row[0].clone(), DeviceType::new(row[1].clone())))
             .collect())
     }
 }
