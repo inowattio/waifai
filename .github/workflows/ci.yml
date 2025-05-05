@@ -1,0 +1,69 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [stable, beta, nightly]
+        include:
+          - build: stable
+            os: ubuntu-latest
+            rust: stable
+          - build: beta
+            os: ubuntu-latest
+            rust: beta
+          - build: nightly
+            os: ubuntu-latest
+            rust: nightly
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust (rustup)
+        run: rustup update ${{ matrix.rust }} --no-self-update && rustup default ${{ matrix.rust }}
+        shell: bash
+      - run: cargo build
+      - run: cargo build --all-features
+      - run: cargo test
+
+  rustfmt_docs_clippy:
+    name: Rustfmt, Docs and Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: rustup update stable && rustup default stable && rustup component add rustfmt && rustup component add clippy
+      - run: cargo fmt -- --check
+      - run: cargo doc --all-features
+      - run: cargo clippy --all-features -- -D warnings
+
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Cargo.lock # explicitly generate the lockfile, see https://github.com/rustsec/audit-check/issues/27
+        run: cargo generate-lockfile
+
+      - name: Audit Check
+        uses: rustsec/audit-check@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  minimum:
+    name: Minimum Rust compiler
+    runs-on: ubuntu-latest
+    env:
+      version: 1.60.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust (rustup)
+        run: |
+          rustup toolchain install ${version} nightly --profile minimal --no-self-update
+          rustup default ${version}
+          cargo +nightly update -Zminimal-versions
+        shell: bash
+      - run: cargo build
+      - run: cargo build --all-features
