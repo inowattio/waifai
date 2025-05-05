@@ -1,5 +1,5 @@
-use waifai::*;
 use waifai::error::WFError;
+use waifai::*;
 
 fn main() -> Result<(), WFError> {
     let interfaces = WiFi::interfaces()?;

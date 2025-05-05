@@ -14,7 +14,9 @@ pub enum WFError {
 }
 
 impl Display for WFError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result { write!(f, "{:?}", self) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }
 
 impl Error for WFError {}

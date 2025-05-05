@@ -1,4 +1,3 @@
-
 #[cfg(feature = "logging")]
 pub use log::*;
 
@@ -17,4 +16,4 @@ macro_rules! error    ( ($($tt:tt)*) => {{}} );
 
 #[cfg(not(feature = "logging"))]
 #[allow(unused_imports)]
-pub use {debug, trace, info, error};
+pub use {debug, error, info, trace};
