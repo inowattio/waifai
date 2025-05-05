@@ -1,11 +1,11 @@
 use std::cmp::PartialEq;
-use std::ffi::OsStr;
 use std::process::Command;
 use crate::client::Client;
 use crate::error::WFError::{CommandErr, CommandParse, HotspotCreate, CommandIO, WifiAction};
 use crate::error::{WFError, WFResult};
 use crate::hotspot::Hotspot;
 use crate::network::Network;
+use crate::log::debug;
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum DeviceType {
@@ -30,10 +30,9 @@ pub struct WiFi {
     interface: String,
 }
 
-pub fn command<I, S>(program: &str, args: I) -> WFResult<String>
-where I: IntoIterator<Item = S>,
-      S: AsRef<OsStr>
+pub fn command(program: &str, args: &[&str]) -> WFResult<String>
 {
+    debug!("{program} {}", args.join(" "));
     let output = Command::new(program)
         .args(args)
         .output()
@@ -114,14 +113,14 @@ impl WiFi {
     }
 
     pub fn connection(&self) -> WFResult<String> {
-        command("nmcli", ["-g", "GENERAL.CONNECTION", "device", "show", &self.interface])
+        command("nmcli", &["-g", "GENERAL.CONNECTION", "device", "show", &self.interface])
     }
 
     pub fn metric(&self) -> WFResult<i16> {
         let connection = self.connection()?;
         let name = &format!("'{connection}'");
 
-        let output = command("nmcli", ["-g", "ipv4.route-metric", "connection", "show", name])?;
+        let output = command("nmcli", &["-g", "ipv4.route-metric", "connection", "show", name])?;
         output.parse().map_err(|_| WifiAction(output))
     }
 
@@ -130,7 +129,7 @@ impl WiFi {
         let name = &format!("'{connection}'");
         let value = &format!("{value}");
 
-        let output = command("nmcli", ["connection", "modify", name, "ipv4.route-metric", value])?;
+        let output = command("nmcli", &["connection", "modify", name, "ipv4.route-metric", value])?;
         if !output.is_empty() {
             return Err(WifiAction(output))
         }
@@ -147,7 +146,7 @@ impl WiFi {
     }
 
     pub fn all_interfaces() -> WFResult<Vec<(String, DeviceType)>> {
-        let output = command("nmcli", ["dev"])?;
+        let output = command("nmcli", &["dev"])?;
         Ok(make_table::<4>(output)?
             .into_iter()
             .map(|row| (row[0].clone(), DeviceType::new(row[1].clone())))
@@ -163,7 +162,7 @@ impl Client for WiFi {
         };
 
         let name = &format!("'{ssid}'");
-        let output = command("nmcli", ["device", "wifi", "connect",
+        let output = command("nmcli", &["device", "wifi", "connect",
             name, "password", password_arg, "ifname", &self.interface])?;
 
         if output.contains("Secrets were required") {
@@ -184,7 +183,7 @@ impl Client for WiFi {
         };
 
         let name = &format!("'{}'", connection.ssid);
-        let output = command("nmcli", ["connection", "down", name])?;
+        let output = command("nmcli", &["connection", "down", name])?;
 
         if !output.contains("successfully deactivated") {
             Err(WifiAction(output))?
@@ -199,7 +198,7 @@ impl Client for WiFi {
             false => "no"
         };
 
-        let output = command("nmcli", ["device", "wifi", "list",
+        let output = command("nmcli", &["device", "wifi", "list",
             "ifname", &self.interface, "--rescan", force_rescan])?;
 
         Ok(make_table::<8>(output)?
@@ -234,7 +233,7 @@ impl Client for WiFi {
     }
 
     fn is_connected(&self) -> WFResult<bool> {
-        let output = command("nmcli", ["--fields", "DEVICE,STATE",
+        let output = command("nmcli", &["--fields", "DEVICE,STATE",
             "device", "status"])?;
         let entries = make_table::<2>(output)?;
 
@@ -251,16 +250,16 @@ impl Client for WiFi {
 impl Hotspot for WiFi {
     fn create(&self, ssid: &str, password: Option<&str>) -> WFResult<()> {
         let id = "Hotspot"; // TODO: dynamic ids/use uuid
-        let _ = command("nmcli", ["con", "delete", id]);
+        let _ = command("nmcli", &["con", "delete", id]);
 
-        let output = command("nmcli", ["con", "add", "type", "wifi",
+        let output = command("nmcli", &["con", "add", "type", "wifi",
             "ifname", &self.interface, "con-name", id, "autoconnect", "yes", "ssid", ssid])?;
 
         if !output.contains("successfully added") {
             Err(HotspotCreate(output))?
         }
 
-        let output = command("nmcli", ["con", "modify",
+        let output = command("nmcli", &["con", "modify",
             "Hotspot", "802-11-wireless.mode", "ap", "802-11-wireless.band", "bg",
             "ipv4.method", "shared"])?;
 
@@ -269,14 +268,14 @@ impl Hotspot for WiFi {
         }
 
         if let Some(password) = password {
-            let output = command("nmcli", ["con", "modify",
+            let output = command("nmcli", &["con", "modify",
                 "Hotspot", "wifi-sec.key-mgmt", "wpa-psk"])?;
 
             if !output.is_empty() {
                 Err(HotspotCreate(output))?
             }
 
-            let output = command("nmcli", ["con", "modify",
+            let output = command("nmcli", &["con", "modify",
                 "Hotspot", "wifi-sec.psk", password])?;
 
             if !output.is_empty() {
@@ -288,7 +287,7 @@ impl Hotspot for WiFi {
     }
 
     fn start(&self) -> WFResult<()> {
-        let output = command("nmcli", ["con", "up", "Hotspot"])?;
+        let output = command("nmcli", &["con", "up", "Hotspot"])?;
 
         if !output.contains("Connection successfully activated") {
             Err(HotspotCreate(output))?
@@ -298,7 +297,7 @@ impl Hotspot for WiFi {
     }
 
     fn stop(&self) -> WFResult<()> {
-        let output = command("nmcli", ["con", "down", "Hotspot"])?;
+        let output = command("nmcli", &["con", "down", "Hotspot"])?;
 
         if !output.contains("successfully deactivated") {
             Err(HotspotCreate(output))?
@@ -308,7 +307,7 @@ impl Hotspot for WiFi {
     }
 
     fn is_active(&self) -> WFResult<bool> {
-        let output = command("nmcli", ["con", "show", "--active"])?;
+        let output = command("nmcli", &["con", "show", "--active"])?;
 
         Ok(output.contains("Hotspot"))
     }

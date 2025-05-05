@@ -1,7 +1,7 @@
 
 # 0.X.Y - DD/MM/YYYY
 ### Changes:
-Nothing, yet...
+- Feat: `logging` feature flag, enables log facade implementation and logs
 
 # 0.2.0 - 30/04/2025
 ### Changes:

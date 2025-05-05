@@ -2,6 +2,8 @@
 //! Interface with Wi-Fi networks.
 //! Currently, only Linux is supported (via `nmcli`).
 
+pub(crate) mod log;
+
 /// WaiFai errors.
 pub mod error;
 /// Discovered networks.
