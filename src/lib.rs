@@ -1,4 +1,3 @@
-
 //! Interface with Wi-Fi networks.
 //! Currently, only Linux is supported (via `nmcli`).
 

@@ -10,7 +10,7 @@ documentation = "https://docs.rs/waifai/latest/waifai/"
 repository = "https://github.com/inowattio/waifai"
 readme = "README.md"
 keywords = ["wifi", "hotspot", "nmcli"]
-rust-version = "1.60.0"
+rust-version = "1.61.0"
 categories = ["network-programming"]
 
 [features]
