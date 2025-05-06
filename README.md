@@ -7,7 +7,7 @@ This is a library to interact with everything related to Wi-Fi: scan, connect, d
 Currently, only Linux is supported (via `nmcli`), but there are plans to also add Windows support.
 
 ## Usage
-Minimum Supported Rust Version is `1.60.0`.
+Minimum Supported Rust Version is `1.61.0`.
 ```rust
 fn main() -> Result<(), WFError> {
     let interfaces = WiFi::interfaces()?;
