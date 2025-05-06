@@ -1,6 +1,6 @@
 
 # 0.X.Y - DD/MM/YYYY
-Nothing yet...
+- Feat: Add more debug logs.
 
 # 0.3.0 - 06/05/2025
 ### Changes:

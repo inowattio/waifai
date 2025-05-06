@@ -31,7 +31,7 @@ pub struct WiFi {
 }
 
 pub fn command(program: &str, args: &[&str]) -> WFResult<String> {
-    debug!("{program} {}", args.join(" "));
+    debug!("Command: {program} {}", args.join(" "));
     let output = Command::new(program)
         .args(args)
         .output()
@@ -40,6 +40,7 @@ pub fn command(program: &str, args: &[&str]) -> WFResult<String> {
     let err: String = String::from_utf8_lossy(&output.stderr)
         .parse()
         .map_err(|_| CommandParse)?;
+    debug!("Err: {err}");
 
     if !err.is_empty() {
         Err(CommandErr(err))?
@@ -48,6 +49,7 @@ pub fn command(program: &str, args: &[&str]) -> WFResult<String> {
     let string: String = String::from_utf8_lossy(&output.stdout)
         .parse()
         .map_err(|_| WFError::CommandParse)?;
+    debug!("Out: {string}");
 
     Ok(string.trim().to_string())
 }
