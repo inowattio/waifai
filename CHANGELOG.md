@@ -1,5 +1,8 @@
 
 # 0.X.Y - DD/MM/YYYY
+Nothing yet...
+
+# 0.3.2 - 06/05/2025
 - Fix: Wifi::up
 
 # 0.3.1 - 06/05/2025
