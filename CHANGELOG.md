@@ -1,5 +1,8 @@
 
 # 0.X.Y - DD/MM/YYYY
+Nothing yet...
+
+# 0.3.1 - 06/05/2025
 - Feat: Add more debug logs.
 - Feat: Add Wifi::up
 
