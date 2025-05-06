@@ -124,23 +124,21 @@ impl WiFi {
 
     pub fn metric(&self) -> WFResult<i16> {
         let connection = self.connection()?;
-        let name = &format!("'{connection}'");
 
         let output = command(
             "nmcli",
-            &["-g", "ipv4.route-metric", "connection", "show", name],
+            &["-g", "ipv4.route-metric", "connection", "show", &connection],
         )?;
         output.parse().map_err(|_| WifiAction(output))
     }
 
     pub fn set_metric(&self, value: i16) -> WFResult<()> {
         let connection = self.connection()?;
-        let name = &format!("'{connection}'");
         let value = &format!("{value}");
 
         let output = command(
             "nmcli",
-            &["connection", "modify", name, "ipv4.route-metric", value],
+            &["connection", "modify", &connection, "ipv4.route-metric", value],
         )?;
         if !output.is_empty() {
             return Err(WifiAction(output));
@@ -174,14 +172,13 @@ impl Client for WiFi {
             Some(password) => password,
         };
 
-        let name = &format!("'{ssid}'");
         let output = command(
             "nmcli",
             &[
                 "device",
                 "wifi",
                 "connect",
-                name,
+                ssid,
                 "password",
                 password_arg,
                 "ifname",
@@ -206,8 +203,7 @@ impl Client for WiFi {
             Some(connection) => connection,
         };
 
-        let name = &format!("'{}'", connection.ssid);
-        let output = command("nmcli", &["connection", "down", name])?;
+        let output = command("nmcli", &["connection", "down", &connection.ssid])?;
 
         if !output.contains("successfully deactivated") {
             Err(WifiAction(output))?

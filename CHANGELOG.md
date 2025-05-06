@@ -2,6 +2,7 @@
 # 0.X.Y - DD/MM/YYYY
 ### Changes:
 - Feat: `logging` feature flag, enables log facade implementation and logs
+- Fix: Revert "Fix: Guard connection-name using commands with ticks"
 
 # 0.2.0 - 30/04/2025
 ### Changes:
