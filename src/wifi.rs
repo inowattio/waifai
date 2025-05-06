@@ -165,6 +165,16 @@ impl WiFi {
             .map(|row| (row[0].clone(), DeviceType::new(row[1].clone())))
             .collect())
     }
+    
+    pub fn up(&self, ssid: &str) -> WFResult<()> {
+        let output = command("nmcli", &["connection", "down", ssid])?;
+
+        if !output.contains("successfully activated") {
+            Err(WifiAction(output))?
+        }
+
+        Ok(())
+    }
 }
 
 impl Client for WiFi {
