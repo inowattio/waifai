@@ -167,7 +167,7 @@ impl WiFi {
     }
     
     pub fn up(&self, ssid: &str) -> WFResult<()> {
-        let output = command("nmcli", &["connection", "down", ssid])?;
+        let output = command("nmcli", &["connection", "up", ssid])?;
 
         if !output.contains("successfully activated") {
             Err(WifiAction(output))?

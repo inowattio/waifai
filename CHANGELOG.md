@@ -1,6 +1,6 @@
 
 # 0.X.Y - DD/MM/YYYY
-Nothing yet...
+- Fix: Wifi::up
 
 # 0.3.1 - 06/05/2025
 - Feat: Add more debug logs.
