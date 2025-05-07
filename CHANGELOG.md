@@ -19,6 +19,7 @@ Nothing yet...
 ### Changes:
 - Feat: `logging` feature flag, enables log facade implementation and logs
 - Fix: Revert "Fix: Guard connection-name using commands with ticks"
+- Feat: raise MSRV to 1.61.0
 
 # 0.2.0 - 30/04/2025
 ### Changes:
