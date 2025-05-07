@@ -7,14 +7,6 @@ use crate::network::Network;
 use std::cmp::PartialEq;
 use std::process::Command;
 
-fn connection_name_as_param(name: String) -> String {
-    if name.contains(" ") {
-        format!("'{name}'")
-    } else {
-        name
-    }
-}
-
 #[derive(PartialEq, Eq, Debug)]
 pub enum DeviceType {
     Wifi,
@@ -137,16 +129,13 @@ impl WiFi {
 
         let output = command(
             "nmcli",
-            &["-g", "ipv4.route-metric", "connection", "show", &connection_name_as_param(connection)],
+            &["-g", "ipv4.route-metric", "connection", "show", &connection],
         )?;
         output.parse().map_err(|_| WifiAction(output))
     }
 
     pub fn set_metric(&self, value: i16) -> WFResult<()> {
-        let connection = match self.connected_network()? {
-            None => Err(WifiAction("No active connection".to_string()))?,
-            Some(network) => network.ssid
-        };
+        let connection = self.connection()?;
         let value = &format!("{value}");
 
         let output = command(
