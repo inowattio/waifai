@@ -186,6 +186,16 @@ impl WiFi {
 
         Ok(())
     }
+    
+    pub fn auto_connect(&self) -> WFResult<()> {
+        let output = command("nmcli", &["device", "connect", &self.interface])?;
+
+        if !output.contains("successfully activated") {
+            Err(WifiAction(output))?
+        }
+
+        Ok(())
+    }
 }
 
 impl Client for WiFi {
