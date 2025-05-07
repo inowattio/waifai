@@ -2,7 +2,7 @@
 # 0.X.Y - DD/MM/YYYY
 - Fix: revert "Fix: In connection name command usages, guard in ticks if it contains spacings" (again)
 
-# 0.3.3 - 06/05/2025
+# 0.3.3 - 07/05/2025
 - Fix: Wifi::disconnect acts on connections instead of interface
 - Fix: In connection name command usages, guard in ticks if it contains spacings
 - Fix: Wifi::set_metric would use connection name instead of ssid
