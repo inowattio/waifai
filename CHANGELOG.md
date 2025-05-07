@@ -1,6 +1,6 @@
 
 # 0.X.Y - DD/MM/YYYY
-Nothing yet...
+- Fix: Wifi::disconnect would get ssid instead of connection name
 
 # 0.3.2 - 06/05/2025
 - Fix: Wifi::up
