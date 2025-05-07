@@ -7,6 +7,14 @@ use crate::network::Network;
 use std::cmp::PartialEq;
 use std::process::Command;
 
+fn connection_name_as_param(name: String) -> String {
+    if name.contains(" ") {
+        format!("'{name}'")
+    } else {
+        name
+    }
+}
+
 #[derive(PartialEq, Eq, Debug)]
 pub enum DeviceType {
     Wifi,
@@ -129,7 +137,7 @@ impl WiFi {
 
         let output = command(
             "nmcli",
-            &["-g", "ipv4.route-metric", "connection", "show", &connection],
+            &["-g", "ipv4.route-metric", "connection", "show", &connection_name_as_param(connection)],
         )?;
         output.parse().map_err(|_| WifiAction(output))
     }
@@ -140,7 +148,7 @@ impl WiFi {
 
         let output = command(
             "nmcli",
-            &["connection", "modify", &connection, "ipv4.route-metric", value],
+            &["connection", "modify", &connection_name_as_param(connection), "ipv4.route-metric", value],
         )?;
         if !output.is_empty() {
             return Err(WifiAction(output));
@@ -211,7 +219,7 @@ impl Client for WiFi {
 
     fn disconnect(&self) -> WFResult<bool> {
         let connection = self.connection()?;
-        let output = command("nmcli", &["connection", "down", &connection])?;
+        let output = command("nmcli", &["connection", "down", &connection_name_as_param(connection)])?;
 
         if !output.contains("successfully deactivated") {
             Err(WifiAction(output))?

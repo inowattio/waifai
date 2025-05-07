@@ -1,6 +1,7 @@
 
 # 0.X.Y - DD/MM/YYYY
 - Fix: Wifi::disconnect would get ssid instead of connection name
+- Fix: In connection name command usages, guard in ticks if it contains spacings
 
 # 0.3.2 - 06/05/2025
 - Fix: Wifi::up
