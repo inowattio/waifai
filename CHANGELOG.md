@@ -1,5 +1,8 @@
 
 # 0.X.Y - DD/MM/YYYY
+Nothing yet...
+
+# 0.3.4 - 07/05/2025
 - Fix: revert "Fix: In connection name command usages, guard in ticks if it contains spacings" (again)
 
 # 0.3.3 - 07/05/2025
