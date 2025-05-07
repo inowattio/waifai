@@ -1,6 +1,6 @@
 
 # 0.X.Y - DD/MM/YYYY
-- Fix: Wifi::disconnect would get ssid instead of connection name
+- Fix: Wifi::disconnect acts on connections instead of interface
 - Fix: In connection name command usages, guard in ticks if it contains spacings
 - Fix: Wifi::set_metric would use connection name instead of ssid
 
