@@ -143,12 +143,15 @@ impl WiFi {
     }
 
     pub fn set_metric(&self, value: i16) -> WFResult<()> {
-        let connection = self.connection()?;
+        let connection = match self.connected_network()? {
+            None => Err(WifiAction("No active connection".to_string()))?,
+            Some(network) => network.ssid
+        };
         let value = &format!("{value}");
 
         let output = command(
             "nmcli",
-            &["connection", "modify", &connection_name_as_param(connection), "ipv4.route-metric", value],
+            &["connection", "modify", &connection, "ipv4.route-metric", value],
         )?;
         if !output.is_empty() {
             return Err(WifiAction(output));
