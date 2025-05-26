@@ -241,10 +241,10 @@ impl Client for WiFi {
                 "device",
                 "wifi",
                 "list",
-                "ifname",
-                &self.interface,
                 "--rescan",
                 force_rescan,
+                "ifname",
+                &self.interface,
             ],
         )?;
 

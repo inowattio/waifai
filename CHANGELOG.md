@@ -1,6 +1,6 @@
 
 # 0.X.Y - DD/MM/YYYY
-Nothing yet...
+- Fix: scan wouldn't rescan on deman due to bad argument placement
 
 # 0.3.4 - 07/05/2025
 - Fix: revert "Fix: In connection name command usages, guard in ticks if it contains spacings" (again)
