@@ -1,5 +1,8 @@
 
 # 0.X.Y - DD/MM/YYYY
+No changes yet...
+
+# 0.4.0 - 17/06/2025
 - Feat: errors CommandIO and CommandParse now provide details
 
 # 0.3.5 - 26/05/2025
