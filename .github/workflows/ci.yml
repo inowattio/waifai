@@ -63,7 +63,7 @@ jobs:
         run: |
           rustup toolchain install ${version} --profile minimal --no-self-update
           rustup default ${version}
-          cargo update -Zminimal-versions
+          cargo update
         shell: bash
       - run: cargo build
       - run: cargo build --all-features
