@@ -140,7 +140,13 @@ impl WiFi {
 
         let output = command(
             "nmcli",
-            &["connection", "modify", &connection, "ipv4.route-metric", value],
+            &[
+                "connection",
+                "modify",
+                &connection,
+                "ipv4.route-metric",
+                value,
+            ],
         )?;
         if !output.is_empty() {
             return Err(WifiAction(output));
@@ -165,7 +171,7 @@ impl WiFi {
             .map(|row| (row[0].clone(), DeviceType::new(row[1].clone())))
             .collect())
     }
-    
+
     pub fn up(&self, ssid: &str) -> WFResult<()> {
         let output = command("nmcli", &["connection", "up", ssid])?;
 
@@ -175,7 +181,7 @@ impl WiFi {
 
         Ok(())
     }
-    
+
     pub fn auto_connect(&self) -> WFResult<()> {
         let output = command("nmcli", &["device", "connect", &self.interface])?;
 
