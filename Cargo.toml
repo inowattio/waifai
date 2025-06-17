@@ -20,4 +20,5 @@ logging = ["dep:log"]
 
 [dependencies]
 serde = { version = "1.0", optional = true }
-log = { version = "0.4", optional = true}
+log = { version = ">=0.4.4", optional = true }
+# versions less than this do not compile due to custom #[macro_export] macros
