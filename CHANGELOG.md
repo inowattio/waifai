@@ -1,6 +1,6 @@
 
 # 0.X.Y - DD/MM/YYYY
-Nothing yet...
+- Feat: errors CommandIO and CommandParse now provide details
 
 # 0.3.5 - 26/05/2025
 - Fix: scan wouldn't rescan on deman due to bad argument placement

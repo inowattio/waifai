@@ -1,6 +1,6 @@
 use crate::client::Client;
 use crate::error::WFError::{CommandErr, CommandIO, CommandParse, HotspotCreate, WifiAction};
-use crate::error::{WFError, WFResult};
+use crate::error::WFResult;
 use crate::hotspot::Hotspot;
 use crate::log::debug;
 use crate::network::Network;
@@ -35,11 +35,11 @@ pub fn command(program: &str, args: &[&str]) -> WFResult<String> {
     let output = Command::new(program)
         .args(args)
         .output()
-        .map_err(|_| CommandIO)?;
+        .map_err(|e| CommandIO(e.to_string()))?;
 
     let err: String = String::from_utf8_lossy(&output.stderr)
         .parse()
-        .map_err(|_| CommandParse)?;
+        .map_err(|_| CommandParse("Couldn't parse stderr to string".into()))?;
     debug!("Err: {err}");
 
     if !err.is_empty() {
@@ -48,7 +48,7 @@ pub fn command(program: &str, args: &[&str]) -> WFResult<String> {
 
     let string: String = String::from_utf8_lossy(&output.stdout)
         .parse()
-        .map_err(|_| WFError::CommandParse)?;
+        .map_err(|_| CommandParse("Couldn't parse stdout to string".into()))?;
     debug!("Out: {string}");
 
     Ok(string.trim().to_string())
@@ -56,12 +56,12 @@ pub fn command(program: &str, args: &[&str]) -> WFResult<String> {
 
 fn make_table<const N: usize>(data: String) -> WFResult<Vec<[String; N]>> {
     let output = data.lines().collect::<Vec<&str>>();
-    let mut output = output.iter();
+    let mut output = output.into_iter();
 
     let mut words: Vec<String> = Vec::new();
     let mut current_word = String::new();
     let mut in_whitespace = false;
-    let header = output.next().ok_or(CommandParse)?;
+    let header = output.next().ok_or_else(|| CommandParse(format!("Couldn't parse table: {data}")))?;
 
     for c in header.chars() {
         if c.is_whitespace() {
