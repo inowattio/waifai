@@ -61,7 +61,9 @@ fn make_table<const N: usize>(data: String) -> WFResult<Vec<[String; N]>> {
     let mut words: Vec<String> = Vec::new();
     let mut current_word = String::new();
     let mut in_whitespace = false;
-    let header = output.next().ok_or_else(|| CommandParse(format!("Couldn't parse table: {data}")))?;
+    let header = output
+        .next()
+        .ok_or_else(|| CommandParse(format!("Couldn't parse table: {data}")))?;
 
     for c in header.chars() {
         if c.is_whitespace() {
