@@ -174,6 +174,12 @@ impl WiFi {
             .collect())
     }
 
+    pub fn delete(&self, name: &str) -> WFResult<bool> {
+        let output = command("nmcli", &["connection", "delete", name])?;
+
+        Ok(output.contains("successfully deleted"))
+    }
+
     pub fn up(&self, ssid: &str) -> WFResult<()> {
         let output = command("nmcli", &["connection", "up", ssid])?;
 
