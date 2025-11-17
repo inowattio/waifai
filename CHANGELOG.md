@@ -1,5 +1,8 @@
 
 # 0.X.Y - DD/MM/YYYY
+No changes yet...
+
+# 0.4.1 - 17/11/2025
 - Feat: add connection delete
 
 # 0.4.0 - 17/06/2025
