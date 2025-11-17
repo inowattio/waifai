@@ -1,6 +1,6 @@
 
 # 0.X.Y - DD/MM/YYYY
-No changes yet...
+- Feat: add connection delete
 
 # 0.4.0 - 17/06/2025
 - Feat: errors CommandIO and CommandParse now provide details
