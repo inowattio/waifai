@@ -5,6 +5,7 @@ use crate::hotspot::Hotspot;
 use crate::log::debug;
 use crate::network::Network;
 use std::cmp::PartialEq;
+use std::net::Ipv4Addr;
 use std::process::Command;
 
 #[derive(PartialEq, Eq, Debug)]
@@ -291,6 +292,31 @@ impl Client for WiFi {
         }
 
         Ok(None)
+    }
+
+    fn ip(&self) -> WFResult<Option<Ipv4Addr>> {
+        let ip_str = command(
+            "nmcli",
+            &["-g", "IP4.ADDRESS", "device", "show", &self.interface],
+        )?;
+
+        if ip_str.trim().is_empty() {
+            return Ok(None);
+        }
+
+        let ip_line = match ip_str.lines().map(str::trim).find(|l| !l.is_empty()) {
+            Some(line) => line,
+            None => return Ok(None),
+        };
+
+        let ip = ip_line
+            .split('/')
+            .next()
+            .ok_or_else(|| CommandParse(format!("Invalid address: {ip_line}")))?
+            .parse()
+            .map_err(|e| CommandParse(format!("Could not parse address: {e:?}")))?;
+
+        Ok(Some(ip))
     }
 
     fn is_connected(&self) -> WFResult<bool> {

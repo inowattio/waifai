@@ -1,6 +1,6 @@
 
 # 0.X.Y - DD/MM/YYYY
-No changes yet...
+- Feat: add ip fetching
 
 # 0.4.1 - 17/11/2025
 - Feat: add connection delete

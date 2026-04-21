@@ -1,5 +1,6 @@
 use crate::error::WFResult;
 use crate::network::Network;
+use std::net::Ipv4Addr;
 
 pub trait Client {
     /// Connect to a network, password is optional as you can connect to networks with no passwords.
@@ -18,6 +19,9 @@ pub trait Client {
     fn scan(&self, force_rescan: bool) -> WFResult<Vec<Network>>;
     /// Retrieves the currently connected network if any.
     fn connected_network(&self) -> WFResult<Option<Network>>;
+    /// IPv4 address from `nmcli -g IP4.ADDRESS device show <interface>`.
+    /// Returns `None` if the device is not connected or the command yields no address.
+    fn ip(&self) -> WFResult<Option<Ipv4Addr>>;
     /// Quickly check if the interface is connected to a network or not, note that this is faster
     /// than checking [connected_network](Client::connected_network).
     fn is_connected(&self) -> WFResult<bool>;
