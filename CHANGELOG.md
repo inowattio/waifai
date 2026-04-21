@@ -1,5 +1,8 @@
 
 # 0.X.Y - DD/MM/YYYY
+No changes yet...
+
+# 0.4.2 - 21/04/2026
 - Feat: add ip fetching
 
 # 0.4.1 - 17/11/2025
